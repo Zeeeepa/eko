@@ -13,6 +13,7 @@ import {
 } from '../types';
 import { ToolRegistry } from './tool-registry';
 import { logger } from '../common/log';
+import { ILogObj, Logger } from 'tslog';
 
 /**
  * Eko core
@@ -33,6 +34,10 @@ export class Eko {
     this.ekoConfig = this.buildEkoConfig(ekoConfig);
     this.registerTools();
     logger.info("using Eko@" + process.env.COMMIT_HASH);
+  }
+
+  public static getLogger(): Logger<ILogObj> {
+    return logger;
   }
 
   private buildEkoConfig(ekoConfig: Partial<EkoConfig> | undefined): EkoConfig {
