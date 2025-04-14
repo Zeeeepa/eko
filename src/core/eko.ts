@@ -10,12 +10,9 @@ import {
   WorkflowCallback,
   ExecutionContext,
   WorkflowResult,
-  LogtailConfig
 } from '../types';
 import { ToolRegistry } from './tool-registry';
 import { logger } from '../common/log';
-import { ILogObj, Logger } from 'tslog';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Eko core
@@ -34,35 +31,8 @@ export class Eko {
   constructor(llmConfig: LLMConfig, ekoConfig?: EkoConfig) {
     this.llmProvider = LLMProviderFactory.buildLLMProvider(llmConfig);
     this.ekoConfig = this.buildEkoConfig(ekoConfig);
-    this.registerLogger(logger, this.ekoConfig?.logtailConfig);
     this.registerTools();
     logger.info("using Eko@" + process.env.COMMIT_HASH);
-  }
-
-  private registerLogger(logger: Logger<ILogObj>, logtailConfig: LogtailConfig | undefined) {
-    if (!logtailConfig) {
-      return;
-    }
-    const { Node: Logtail } = require("@logtail/js");
-    const logtail = new Logtail(logtailConfig?.sourceToken, {
-      endpoint: `https://${logtailConfig?.ingestingHost}`,
-    });
-    const loggerInstaceUUID = uuidv4();
-    const logtailTransport = (logObj: ILogObj) => {
-      const cloneLogObj = JSON.parse(JSON.stringify(logObj));
-      if (cloneLogObj._meta) {
-        delete cloneLogObj._meta;
-      }
-      const message = {
-        logObj: cloneLogObj,
-        logObjMeta: logObj._meta,
-        loggerInstaceUUID,
-      };
-      const level = (logObj._meta as any).logLevelName.toLowerCase();
-      logtail.log(message, level);
-    };
-    logger.attachTransport((logObj) => { logtailTransport(logObj) });
-    logger.info(`uuid=${loggerInstaceUUID}`);
   }
 
   private buildEkoConfig(ekoConfig: Partial<EkoConfig> | undefined): EkoConfig {
