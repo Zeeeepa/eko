@@ -412,9 +412,11 @@ export class ActionImpl implements Action {
 
     // get already existing tabs as task background
     const currentWindow = await context.ekoConfig.chromeProxy.windows.getCurrent();
-    const existingTabs: chrome.tabs.Tab[] = await context.ekoConfig.chromeProxy.tabs.query({
-      windowId: currentWindow.id,
-    });
+    // const existingTabs: chrome.tabs.Tab[] = await context.ekoConfig.chromeProxy.tabs.query({
+    //   windowId: currentWindow.id,
+    // });
+    // logger.debug("existingTabs", existingTabs);
+    const existingTabs: chrome.tabs.Tab[] = [];
 
     // get patchs for task
     let patchs: PatchItem[] = [];
